@@ -1,24 +1,23 @@
 <?php
-class User
-{
-    private $dbname = "test";
+class User{
+    private $host = "localhost";
     private $username = "root";
     private $password = "";
-    private $hostname = "localhost";
+    private $database = "test";
 
-    public static $user_data = false;
-
-    public $conn = false;
-    public function __construct()
-    {
-        if (!$this->conn) {
-            $this->conn = new mysqli($this->hostname, $this->username, $this->password, $this->dbname);
-            if ($this->conn->connect_error) {
-                die("Something Went wrong: " . $this->conn->connect_error);
+    private $conn = null;
+    // create connection with db
+   function __construct(){
+        try {
+            if(!$this->conn){
+                $this->conn = new mysqli($this->host,$this->username,$this->password,$this->database) or die("Something went wrong"); 
             }
+        } catch (Throwable $th) {
+            echo $th->getMessage();
         }
     }
 
+    // function for message 
     public function showMessage($message)
     {
         echo "
@@ -27,6 +26,8 @@ class User
         </script>
     ";
     }
+
+    // function for sign in
     public function login($email, $password)
     {
         if (empty($email) || empty($password)) {
@@ -55,29 +56,34 @@ class User
             }
         }
     }
-    public function register($username, $password, $cpassword, $email)
-    {
-        if (!$username || !$password || !$cpassword || !$email) {
-            $this->showMessage("All fields are mandatory!");
-            exit(1);
-        }
-        if ($password != $cpassword) {
-            $this->showMessage("Both password and confirm password should same!");
-            exit(1);
-        }
-        $sql = "INSERT INTO user (username,password,email) VALUES ('$username','$password','$email');";
 
-        $res = $this->conn->query($sql);
-        if ($res) {
-            $this->showMessage("user registerd successfully");
-            return true;
-        } else {
-            $this->showMessage("Error in Creating account!");
+    // function for the sign up
+    public function signup ($username,$password,$email,$image,$age,$country,$sal,$phone,$gender){
+
+        if(empty($username) || empty($password) || empty($email) || empty($image) || empty($age) || empty($country) || empty($sal) || empty($phone) || empty($gender)){
+            $this->showMessage("All fields are mandatory!");
             return false;
+        }
+
+        if($this->conn){
+            $sql = "INSERT INTO user (username,password,email,image,age,country,phone,gender,sal) VALUES ('$username','$password','$email','$image','$age','$country','$phone','$gender','$sal') ";
+            
+            $res = $this->conn->query($sql);    
+            if($res){
+                $this->showMessage("Record inserted successfully!");
+                return true;
+            }
+            else{
+                $this->showMessage("Cannot insert record");
+                return false;
+            }
+        }
+        else{
+            $this->showMessage("Cannot insert record");
         }
     }
 
-    //get user profile info
+    // function for the get user Data
     public function get_profile()
     {
         if (isset($_COOKIE['user_info'])) {
@@ -89,9 +95,28 @@ class User
         }
     }
 
-    public function __destruct()
-    {
-        if (isset($this->conn)) {
+    //function for upadtion 
+    function update_user(){
+
+    }
+
+
+    // function for delete user 
+    function delete_user(){
+    
+    }
+
+    // function  for the data fetching
+    function fetchData($sql){
+
+    }
+    // function for the signout
+    function sign_out(){
+
+    }
+    // Close connection
+    function __destruct(){
+        if($this->conn){
             $this->conn->close();
         }
     }

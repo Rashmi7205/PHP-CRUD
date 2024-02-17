@@ -1,15 +1,7 @@
 <?php
     include("user.php");
     if(isset($_POST["submit"])){
-        $user = new User();
-        $res = $user->login($_POST['email'],$_POST['password']);
-        if($res){
-            header('Location: http://localhost/phplect/crud');
-            exit();
-        }
-        else{
-            header('Location: http://localhost/phplect/login.php');
-        }
+     
     }
 ?>
 
